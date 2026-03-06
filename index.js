@@ -1,4 +1,4 @@
-import { createWalletClient, custom, createPublicClient, simulateContract } from 'https://esm.sh/viem';
+import { createWalletClient, custom, createPublicClient, simulateContract, defineChain } from 'https://esm.sh/viem';
 import { contractAddress, abi } from './contract-js.js';
 const connectButton = document.getElementById('connectButton');
 const balanceButton = document.getElementById('balanceButton');
@@ -37,12 +37,32 @@ async function fund () {
     publicClient.simulateContract({
       abi,
       address: contractAddress,
-      
+
     })
 
   } else {
     console.log('MetaMask is not installed. Please install it to use this app.');
   }
 }
+
+async function getCurrentChain (client) {
+  const chainId = await client.getChainId()
+  const currentChain = defineChain({  
+    id: chainId,
+    name: "Custom Chain",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["http://localhost:8545"],
+      },
+    },
+  })
+  return currentChain
+}
+
 
 connectButton.onclick = connect
